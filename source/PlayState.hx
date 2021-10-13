@@ -152,6 +152,8 @@ class PlayState extends MusicBeatState
 	public var healthBar:FlxBar;
 	var songPercent:Float = 0;
 
+	public var elapsedtime:Float = 0;
+
 	private var timeBarBG:AttachedSprite;
 	public var timeBar:FlxBar;
 
@@ -203,6 +205,8 @@ class PlayState extends MusicBeatState
 	var bottomBoppers:BGSprite;
 	var santa:BGSprite;
 	var heyTimer:Float;
+
+	public var curbg:FlxSprite;
 
 	var bgGirls:BackgroundGirls;
 	var wiggleShit:WiggleEffect = new WiggleEffect();
@@ -321,6 +325,8 @@ class PlayState extends MusicBeatState
 					curStage = 'school';
 				case 'thorns':
 					curStage = 'schoolEvil';
+				case 'cheating':
+					curStage = 'cheater';
 				default:
 					curStage = 'stage';
 			}
@@ -379,6 +385,21 @@ class PlayState extends MusicBeatState
 					stageCurtains.updateHitbox();
 					add(stageCurtains);
 				}
+
+			case 'cheater': //CHEATING
+				var bg:BGSprite = new BGSprite('cheater', -600, -200, 0, 0);
+				bg.active = true;
+				add(bg);
+
+				if(!ClientPrefs.lowQuality) {
+					// below code assumes shaders are always enabled which is bad
+					var testshader:Shaders.GlitchEffect = new Shaders.GlitchEffect();
+					testshader.waveAmplitude = 0.1;
+					testshader.waveFrequency = 5;
+					testshader.waveSpeed = 2;
+					bg.shader = testshader.shader;
+				}
+				curbg = bg;
 
 			case 'spooky': //Week 2
 				if(!ClientPrefs.lowQuality) {
@@ -1647,7 +1668,7 @@ class PlayState extends MusicBeatState
 		for (i in 0...4)
 		{
 			// FlxG.log.add(i);
-			var babyArrow:StrumNote = new StrumNote(ClientPrefs.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X, strumLine.y, i, player);
+			var babyArrow:StrumNote = new StrumNote(ClientPrefs.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X, strumLine.y, i, player, Paths.formatToSongPath(SONG.song) == 'cheating' && player != 1);
 			if (!isStoryMode)
 			{
 				babyArrow.y -= 10;
@@ -1816,7 +1837,17 @@ class PlayState extends MusicBeatState
 			iconP1.swapOldIcon();
 		}*/
 
+		elapsedtime += elapsed;
 		callOnLuas('onUpdate', [elapsed]);
+
+		if (curbg != null)
+		{
+			if (curbg.active) // only the cheating background is active
+			{
+				var shad = cast(curbg.shader, Shaders.GlitchShader);
+				shad.uTime.value[0] += elapsed;
+			}
+		}
 
 		switch (curStage)
 		{
@@ -1928,6 +1959,20 @@ class PlayState extends MusicBeatState
 						heyTimer = 0;
 					}
 				}
+			case 'cheater':
+				dad.y += (Math.sin(elapsedtime) * 0.5);
+
+				playerStrums.forEach(function(spr:FlxSprite)
+				{
+					spr.x += Math.sin(elapsedtime) * ((spr.ID % 2) == 0 ? 1 : -1) * 0.5;
+					spr.x -= Math.sin(elapsedtime);
+				});
+
+				opponentStrums.forEach(function(spr:FlxSprite)
+				{
+					spr.x -= Math.sin(elapsedtime) * ((spr.ID % 2) == 0 ? 1 : -1) * 0.5;
+					spr.x += Math.sin(elapsedtime);
+				});
 		}
 
 		if(!inCutscene) {
@@ -3775,8 +3820,11 @@ class PlayState extends MusicBeatState
 			camHUD.zoom += 0.03;
 		}
 
-		iconP1.setGraphicSize(Std.int(iconP1.width + 30));
-		iconP2.setGraphicSize(Std.int(iconP2.width + 30));
+		var funny:Float = (healthBar.percent * 0.01) + 0.01; // more code from the original mod lol
+
+		// health icon bounce but epic
+		iconP1.setGraphicSize(Std.int(iconP1.width + (50 * funny)),Std.int(iconP2.height - (25 * funny)));
+		iconP2.setGraphicSize(Std.int(iconP2.width + (50 * (2 - funny))),Std.int(iconP2.height - (25 * (2 - funny))));
 
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();
