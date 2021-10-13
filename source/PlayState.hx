@@ -2035,6 +2035,13 @@ class PlayState extends MusicBeatState
 
 		if (FlxG.keys.justPressed.SEVEN && !endingSong && !inCutscene)
 		{
+			if (Paths.formatToSongPath(SONG.song) == 'cheating')
+			{
+				practiceMode = false;
+				health = 0;
+				return;
+			}
+
 			persistentUpdate = false;
 			paused = true;
 			cancelFadeTween();
