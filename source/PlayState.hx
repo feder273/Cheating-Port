@@ -1964,14 +1964,14 @@ class PlayState extends MusicBeatState
 
 				playerStrums.forEach(function(spr:FlxSprite)
 				{
-					spr.x += Math.sin(elapsedtime) * ((spr.ID % 2) == 0 ? 1 : -1) * 0.5;
-					spr.x -= Math.sin(elapsedtime);
+					spr.x += Math.sin(elapsedtime) * ((spr.ID % 2) == 0 ? 1 : -1);
+					spr.x -= Math.sin(elapsedtime) * 1.5;
 				});
 
 				opponentStrums.forEach(function(spr:FlxSprite)
 				{
-					spr.x -= Math.sin(elapsedtime) * ((spr.ID % 2) == 0 ? 1 : -1) * 0.5;
-					spr.x += Math.sin(elapsedtime);
+					spr.x -= Math.sin(elapsedtime) * ((spr.ID % 2) == 0 ? 1 : -1);
+					spr.x += Math.sin(elapsedtime) * 1.5;
 				});
 		}
 
