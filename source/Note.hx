@@ -251,7 +251,7 @@ class Note extends FlxSprite
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 			loadPixelNoteAnims();
 			antialiasing = false;
-		} else if (thd) {
+		} else if (thd || !thd && PlayState.SONG.song = 'cheating' && ((this.strumTime / 50) % 20 > 10)) {
 			frames = Paths.getSparrowAtlas("NOTE_assets_3D");
 			loadNoteAnims();
 			antialiasing = ClientPrefs.globalAntialiasing;
